@@ -1,9 +1,7 @@
-package com.bank.authservice.util;
+package com.bank.customerservice.util;
 
-import com.bank.authservice.entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,9 +17,6 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.expiration}")
-    private long jwtExpiration;
-
     // Generate Signing Key
     private Key getSigningKey() {
 
@@ -30,21 +25,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // Generate JWT Token
-    public String generateToken(String email, Role role) {
-
-        return Jwts.builder()
-                .setSubject(email)
-                .claim("role", role)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(
-                        new Date(System.currentTimeMillis() + jwtExpiration)
-                )
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    // Extract Username
+    // Extract Username (Email)
     public String extractUsername(String token) {
 
         return extractClaim(token, Claims::getSubject);
@@ -55,8 +36,15 @@ public class JwtService {
 
         return extractClaim(token, Claims::getExpiration);
     }
+    public String extractRole(String token) {
 
-    // Extract Specific Claim
+        return extractClaim(
+                token,
+                claims -> claims.get("role", String.class)
+        );
+    }
+
+    // Generic Claim Extractor
     public <T> T extractClaim(
             String token,
             Function<Claims, T> claimsResolver
@@ -77,18 +65,16 @@ public class JwtService {
                 .getBody();
     }
 
-    // Check Expiration
+    // Check Token Expiration
     private boolean isTokenExpired(String token) {
 
-        return extractExpiration(token).before(new Date());
+        return extractExpiration(token)
+                .before(new Date());
     }
 
     // Validate Token
-    public boolean validateToken(String token, String email) {
+    public boolean validateToken(String token) {
 
-        final String extractedEmail = extractUsername(token);
-
-        return extractedEmail.equals(email)
-                && !isTokenExpired(token);
+        return !isTokenExpired(token);
     }
 }

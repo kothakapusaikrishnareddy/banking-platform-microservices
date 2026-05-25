@@ -31,17 +31,16 @@
     <!-- Microservice Modules -->
     <modules>
         <module>services/auth-service</module>
-        <!--
         <module>services/customer-service</module>
-        <module>services/account-service</module>
-        <module>services/transaction-service</module>
-        <module>services/payment-service</module>
-        <module>services/loan-service</module>
-        <module>services/notification-service</module>
-        <module>services/audit-service</module>
-        <module>services/reporting-service</module>
-        <module>services/api-gateway</module>
-        -->
+        <!--    <module>services/account-service</module>
+            <module>services/transaction-service</module>
+            <module>services/payment-service</module>
+            <module>services/loan-service</module>
+            <module>services/notification-service</module>
+            <module>services/audit-service</module>
+            <module>services/reporting-service</module>
+            <module>services/api-gateway</module>
+            -->
 
     </modules>
 
