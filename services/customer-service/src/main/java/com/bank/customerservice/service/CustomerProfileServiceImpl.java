@@ -41,6 +41,7 @@ public class CustomerProfileServiceImpl implements CustomerProfileService{
 
 
         CustomerProfile customerProfile = CustomerProfile.builder()
+                .email(email)
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .dateOfBirth(request.getDateOfBirth())
