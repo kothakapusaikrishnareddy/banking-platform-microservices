@@ -1,11 +1,14 @@
 package com.bank.accountservice.service;
 
 import com.bank.accountservice.dto.request.CreateBankAccountRequest;
+import com.bank.accountservice.dto.request.CreditRequest;
+import com.bank.accountservice.dto.request.DebitRequest;
 import com.bank.accountservice.dto.response.BalanceResponse;
 import com.bank.accountservice.dto.response.BankAccountResponse;
 import com.bank.accountservice.entity.AccountStatus;
 import com.bank.accountservice.entity.BankAccount;
 import com.bank.accountservice.exception.AccountNotFoundException;
+import com.bank.accountservice.exception.InsufficientBalanceException;
 import com.bank.accountservice.exception.UnauthorizedAccountAccessException;
 import com.bank.accountservice.repository.BankAccountRepository;
 import com.bank.accountservice.util.AccountNumberGenerator;
@@ -101,6 +104,73 @@ public class BankAccountServiceImpl implements BankAccountService {
         }
 
         return response;
+    }
+
+    @Override
+    public void debitAccount(
+            DebitRequest request
+    ) {
+
+        BankAccount bankAccount =
+                bankAccountRepository
+                        .findByAccountNumber(
+                                request.getAccountNumber()
+                        )
+                        .orElseThrow(() ->
+                                new AccountNotFoundException(
+                                        "Account not found"
+                                )
+                        );
+
+        // Check sufficient balance
+        if (bankAccount.getBalance()
+                .compareTo(request.getAmount()) < 0) {
+
+            throw new InsufficientBalanceException(
+                    "Insufficient balance"
+            );
+        }
+
+        // Deduct balance
+        bankAccount.setBalance(
+                bankAccount.getBalance()
+                        .subtract(request.getAmount())
+        );
+
+        bankAccount.setUpdatedAt(
+                LocalDateTime.now()
+        );
+
+        bankAccountRepository.save(bankAccount);
+    }
+
+    @Override
+    public void creditAccount(
+            CreditRequest request
+    ) {
+
+        BankAccount bankAccount =
+                bankAccountRepository
+                        .findByAccountNumber(
+                                request.getAccountNumber()
+                        )
+                        .orElseThrow(() ->
+                                new AccountNotFoundException(
+                                        "Account not found"
+                                )
+                        );
+
+        // Add balance
+        bankAccount.setBalance(
+                bankAccount.getBalance()
+                        .add(request.getAmount())
+        );
+
+        bankAccount.setUpdatedAt(
+                LocalDateTime.now()
+        );
+
+        bankAccountRepository.save(bankAccount);
     }
 
     public String generateUniqueAccountNumber() {

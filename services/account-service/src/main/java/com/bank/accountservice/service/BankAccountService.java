@@ -1,6 +1,8 @@
 package com.bank.accountservice.service;
 
 import com.bank.accountservice.dto.request.CreateBankAccountRequest;
+import com.bank.accountservice.dto.request.CreditRequest;
+import com.bank.accountservice.dto.request.DebitRequest;
 import com.bank.accountservice.dto.response.BalanceResponse;
 import com.bank.accountservice.dto.response.BankAccountResponse;
 import com.bank.accountservice.exception.UnauthorizedAccountAccessException;
@@ -14,4 +16,8 @@ public interface BankAccountService {
 
     BankAccountResponse getAccountDetails(String accountNumber, String customerEmail) throws UnauthorizedAccountAccessException;
     BalanceResponse  getBalance(String accountNumber,  String customerEmail);
+
+    void debitAccount(DebitRequest request);
+
+    void creditAccount(CreditRequest request);
 }
